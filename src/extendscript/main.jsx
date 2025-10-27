@@ -7,7 +7,7 @@
 /**
  * Main function to generate 30 documents from a template
  * @param {Object} params - Contains templatePath, imageFolder, and outputFolder
- * @returns {Object} Success status and message
+ * @returns {String} JSON string with success status and message
  */
 function generateDocuments(params) {
     try {
@@ -17,17 +17,17 @@ function generateDocuments(params) {
 
         // Validate inputs
         if (!File(templatePath).exists) {
-            return {
+            return JSON.stringify({
                 success: false,
                 message: "Template file not found: " + templatePath
-            };
+            });
         }
 
         if (!imageFolder.exists) {
-            return {
+            return JSON.stringify({
                 success: false,
                 message: "Image folder not found: " + params.imageFolder
-            };
+            });
         }
 
         // Create output folder if it doesn't exist
@@ -39,10 +39,10 @@ function generateDocuments(params) {
         var imageFiles = getImageFiles(imageFolder);
 
         if (imageFiles.length === 0) {
-            return {
+            return JSON.stringify({
                 success: false,
                 message: "No image files found in the selected folder"
-            };
+            });
         }
 
         // Sort image files by name
@@ -88,18 +88,18 @@ function generateDocuments(params) {
             message += "\n\nErrors encountered:\n" + errors.join("\n");
         }
 
-        return {
+        return JSON.stringify({
             success: true,
             message: message,
             processedCount: processedCount,
             totalImages: imageFiles.length
-        };
+        });
 
     } catch (error) {
-        return {
+        return JSON.stringify({
             success: false,
             message: "Error: " + error.message + " (Line: " + error.line + ")"
-        };
+        });
     }
 }
 
@@ -212,15 +212,15 @@ function getImageFiles(folder) {
 /**
  * Export the active document to PDF and PNG
  * @param {Object} params - Contains outputFolder
- * @returns {Object} Success status and message
+ * @returns {String} JSON string with success status and message
  */
 function exportDocument(params) {
     try {
         if (app.documents.length === 0) {
-            return {
+            return JSON.stringify({
                 success: false,
                 message: "No active document to export"
-            };
+            });
         }
 
         var doc = app.activeDocument;
@@ -260,18 +260,18 @@ function exportDocument(params) {
             doc.exportFile(ExportFormat.PNG_FORMAT, pngFile, false);
         }
 
-        return {
+        return JSON.stringify({
             success: true,
             message: "Exported PDF and " + doc.pages.length + " PNG files successfully",
             pdfPath: pdfFile.fsName,
             pngFolder: pngFolder.fsName
-        };
+        });
 
     } catch (error) {
-        return {
+        return JSON.stringify({
             success: false,
             message: "Export error: " + error.message + " (Line: " + error.line + ")"
-        };
+        });
     }
 }
 
@@ -290,40 +290,68 @@ function padZero(num, size) {
 /**
  * Select a folder using the system dialog
  * @param {String} prompt - The dialog prompt
- * @returns {Object} Selected folder path or null
+ * @returns {String} JSON string with selected folder path or error
  */
 function selectFolder(prompt) {
-    var folder = Folder.selectDialog(prompt);
-    if (folder) {
-        return {
-            success: true,
-            path: folder.fsName
-        };
-    } else {
-        return {
+    try {
+        var folder = Folder.selectDialog(prompt);
+        if (folder) {
+            return JSON.stringify({
+                success: true,
+                path: folder.fsName
+            });
+        } else {
+            return JSON.stringify({
+                success: false,
+                message: "No folder selected"
+            });
+        }
+    } catch (e) {
+        return JSON.stringify({
             success: false,
-            message: "No folder selected"
-        };
+            message: "Error: " + e.message
+        });
     }
 }
 
 /**
  * Select a file using the system dialog
  * @param {String} prompt - The dialog prompt
- * @param {String} filter - File filter (e.g., "*.indd")
- * @returns {Object} Selected file path or null
+ * @param {String} filter - File filter (e.g., "*.indd" or function)
+ * @returns {String} JSON string with selected file path or error
  */
 function selectFile(prompt, filter) {
-    var file = File.openDialog(prompt, filter);
-    if (file) {
-        return {
-            success: true,
-            path: file.fsName
-        };
-    } else {
-        return {
+    try {
+        // File.openDialog on Mac and Windows
+        // Filter can be a string on Windows ("*.indd") or a function
+        var file;
+
+        if (filter && filter !== "") {
+            // For InDesign files, we'll use a function filter that works cross-platform
+            file = File.openDialog(prompt, function(f) {
+                if (f instanceof Folder) return true;
+                var name = f.name.toLowerCase();
+                return name.indexOf('.indd') > -1 || name.indexOf('.indt') > -1;
+            });
+        } else {
+            file = File.openDialog(prompt);
+        }
+
+        if (file) {
+            return JSON.stringify({
+                success: true,
+                path: file.fsName
+            });
+        } else {
+            return JSON.stringify({
+                success: false,
+                message: "No file selected"
+            });
+        }
+    } catch (e) {
+        return JSON.stringify({
             success: false,
-            message: "No file selected"
-        };
+            message: "Error: " + e.message
+        });
     }
 }
