@@ -5,24 +5,36 @@
 #include "json2.js"
 
 /**
- * Main function to generate 30 documents from a template
- * @param {Object} params - Contains templatePath, imageFolder, and outputFolder
+ * Main function to generate multiple documents from the active document
+ * @param {Object} params - Contains imageFolder and outputFolder
  * @returns {String} JSON string with success status and message
  */
 function generateDocuments(params) {
     try {
-        var templatePath = params.templatePath;
+        // Check if there's an active document
+        if (app.documents.length === 0) {
+            return JSON.stringify({
+                success: false,
+                message: "Please open your template document in InDesign first"
+            });
+        }
+
+        var activeDoc = app.activeDocument;
+
+        // Check if document is saved
+        if (!activeDoc.saved || !activeDoc.fullName) {
+            return JSON.stringify({
+                success: false,
+                message: "Please save your template document before generating copies"
+            });
+        }
+
+        // Get the template path from the active document
+        var templatePath = activeDoc.fullName.fsName;
         var imageFolder = new Folder(params.imageFolder);
         var outputFolder = new Folder(params.outputFolder);
 
         // Validate inputs
-        if (!File(templatePath).exists) {
-            return JSON.stringify({
-                success: false,
-                message: "Template file not found: " + templatePath
-            });
-        }
-
         if (!imageFolder.exists) {
             return JSON.stringify({
                 success: false,

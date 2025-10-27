@@ -10,28 +10,10 @@ interface Status {
 }
 
 const App: React.FC = () => {
-  const [templatePath, setTemplatePath] = useState<string>('');
   const [imageFolder, setImageFolder] = useState<string>('');
   const [outputFolder, setOutputFolder] = useState<string>('');
   const [exportFolder, setExportFolder] = useState<string>('');
   const [status, setStatus] = useState<Status>({ type: 'idle', message: '' });
-
-  const selectTemplateFile = () => {
-    const script = `selectFile("Select InDesign Template File", "InDesign Files:*.indd;*.indt")`;
-    csInterface.evalScript(script, (result: string) => {
-      try {
-        const data = JSON.parse(result);
-        if (data.success) {
-          setTemplatePath(data.path);
-          setStatus({ type: 'success', message: 'Template file selected' });
-        } else {
-          setStatus({ type: 'error', message: data.message || 'Failed to select template' });
-        }
-      } catch (e) {
-        setStatus({ type: 'error', message: 'Error selecting template file' });
-      }
-    });
-  };
 
   const selectImageFolder = () => {
     const script = `selectFolder("Select Folder with Background Images")`;
@@ -85,10 +67,6 @@ const App: React.FC = () => {
   };
 
   const generateDocuments = () => {
-    if (!templatePath) {
-      setStatus({ type: 'error', message: 'Please select a template file' });
-      return;
-    }
     if (!imageFolder) {
       setStatus({ type: 'error', message: 'Please select an image folder' });
       return;
@@ -101,7 +79,6 @@ const App: React.FC = () => {
     setStatus({ type: 'loading', message: 'Generating documents... This may take a few minutes.' });
 
     const params = {
-      templatePath,
       imageFolder,
       outputFolder
     };
@@ -156,11 +133,6 @@ const App: React.FC = () => {
     });
   };
 
-  const getFileName = (path: string) => {
-    if (!path) return '';
-    return path.split(/[\\/]/).pop() || path;
-  };
-
   const getFolderName = (path: string) => {
     if (!path) return '';
     return path.split(/[\\/]/).pop() || path;
@@ -170,25 +142,24 @@ const App: React.FC = () => {
     <div className="app">
       <div className="header">
         <h1>Document Generator</h1>
-        <p className="subtitle">Create multiple InDesign documents with different backgrounds</p>
+        <p className="subtitle">Create multiple documents with different backgrounds</p>
       </div>
 
       <div className="content">
+        {/* Important Note */}
+        <div className="section" style={{backgroundColor: '#1f3a2a', borderColor: '#4caf50'}}>
+          <h2 style={{color: '#81c784'}}>⚠️ Before You Start</h2>
+          <p className="section-note" style={{color: '#b2dfb4', fontSize: '13px', margin: '8px 0'}}>
+            1. Open your template document in InDesign<br/>
+            2. Make sure it has a frame labeled "ImageFrame" on the Parent Page<br/>
+            3. Use the plugin to generate copies with different backgrounds
+          </p>
+        </div>
+
         {/* SECTION 1: Generate Documents */}
         <div className="section">
-          <h2>1. Generate Documents</h2>
-
-          <div className="input-group">
-            <label>Template File:</label>
-            <div className="file-input">
-              <button onClick={selectTemplateFile} className="btn-secondary">
-                Choose Template
-              </button>
-              <span className="file-name">
-                {templatePath ? getFileName(templatePath) : 'No template selected'}
-              </span>
-            </div>
-          </div>
+          <h2>Generate Documents</h2>
+          <p className="section-note">Creates multiple copies of the active document</p>
 
           <div className="input-group">
             <label>Images Folder:</label>
@@ -225,8 +196,8 @@ const App: React.FC = () => {
 
         {/* SECTION 2: Export Active Document */}
         <div className="section">
-          <h2>2. Export Active Document</h2>
-          <p className="section-note">Export the currently open document to PDF and PNG files</p>
+          <h2>Export Active Document</h2>
+          <p className="section-note">Export to PDF and PNG files</p>
 
           <div className="input-group">
             <label>Export Folder:</label>
@@ -259,7 +230,7 @@ const App: React.FC = () => {
 
       <div className="footer">
         <p className="help-text">
-          <strong>Setup:</strong> Your template must have a frame labeled "ImageFrame" on the Parent Page
+          <strong>Tip:</strong> Save your template before generating documents
         </p>
       </div>
     </div>
