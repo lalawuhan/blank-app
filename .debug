@@ -2,7 +2,7 @@
 <ExtensionList>
   <Extension Id="com.indesign.documentgenerator">
     <HostList>
-      <Host Name="InDesign" Port="8088"/>
+      <Host Name="IDSN" Port="8088"/>
     </HostList>
   </Extension>
 </ExtensionList>

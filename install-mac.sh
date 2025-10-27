@@ -11,11 +11,13 @@ if [ ! -d "dist" ]; then
     exit 1
 fi
 
-# Enable debug mode for CEP
+# Enable debug mode for CEP (including CEP 12)
 echo "📝 Enabling CEP debug mode..."
-defaults write com.adobe.CSXS.9 PlayerDebugMode 1
-defaults write com.adobe.CSXS.10 PlayerDebugMode 1
+defaults write com.adobe.CSXS.12 PlayerDebugMode 1
+defaults write com.adobe.CSXS.12 LogLevel 6
 defaults write com.adobe.CSXS.11 PlayerDebugMode 1
+defaults write com.adobe.CSXS.10 PlayerDebugMode 1
+defaults write com.adobe.CSXS.9 PlayerDebugMode 1
 
 # Create extensions directory if it doesn't exist
 CEP_DIR="$HOME/Library/Application Support/Adobe/CEP/extensions"
