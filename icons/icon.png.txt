@@ -1,0 +1,3 @@
+# Create a 24x24 icon.png file here
+# You can use any image editor to create a simple icon
+# For now, this is just a placeholder

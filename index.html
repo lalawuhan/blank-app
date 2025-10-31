@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Document Generator</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 16px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background-color: #262626;
+            color: #e0e0e0;
+            font-size: 13px;
+        }
+
+        h1 {
+            font-size: 20px;
+            font-weight: 600;
+            margin: 0 0 8px 0;
+            color: #ffffff;
+        }
+
+        .subtitle {
+            font-size: 12px;
+            color: #b0b0b0;
+            margin: 0 0 20px 0;
+        }
+
+        .section {
+            background-color: #2d2d2d;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border: 1px solid #404040;
+        }
+
+        .section h2 {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0 0 12px 0;
+            color: #ffffff;
+        }
+
+        .section-note {
+            font-size: 12px;
+            color: #b0b0b0;
+            margin: 0 0 16px 0;
+            font-style: italic;
+        }
+
+        .warning-box {
+            background-color: #1f3a2a;
+            border-color: #4caf50;
+            border-left: 4px solid #4caf50;
+            padding: 12px;
+            margin-bottom: 16px;
+            border-radius: 4px;
+        }
+
+        .warning-box h2 {
+            color: #81c784;
+            font-size: 14px;
+            margin: 0 0 8px 0;
+        }
+
+        .warning-box p {
+            color: #b2dfb4;
+            font-size: 12px;
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #d0d0d0;
+        }
+
+        .file-input {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        button {
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 10px 16px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #0066cc 0%, #0052a3 100%);
+            color: #ffffff;
+            width: 100%;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: linear-gradient(135deg, #0077ee 0%, #0066cc 100%);
+        }
+
+        .btn-primary:disabled {
+            background: #404040;
+            color: #808080;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background-color: #404040;
+            color: #e0e0e0;
+        }
+
+        .btn-secondary:hover {
+            background-color: #4d4d4d;
+        }
+
+        .file-name {
+            font-size: 12px;
+            color: #b0b0b0;
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .status {
+            margin-top: 16px;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            border-left: 4px solid;
+        }
+
+        .status pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: inherit;
+        }
+
+        .status-success {
+            background-color: #1f3a2a;
+            border-color: #4caf50;
+            color: #81c784;
+        }
+
+        .status-error {
+            background-color: #3d2626;
+            border-color: #f44336;
+            color: #ef5350;
+        }
+
+        .status-loading {
+            background-color: #2d3b4d;
+            border-color: #4a90e2;
+            color: #4a90e2;
+        }
+
+        .footer {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #404040;
+            font-size: 11px;
+            color: #808080;
+        }
+    </style>
+</head>
+<body>
+    <h1>Document Generator</h1>
+    <p class="subtitle">Create multiple documents with different backgrounds</p>
+
+    <div class="warning-box">
+        <h2>⚠️ Before You Start</h2>
+        <p>
+            1. Open your template document in InDesign<br>
+            2. Make sure it has a frame labeled "ImageFrame" on the Parent Page<br>
+            3. Use the plugin to generate copies with different backgrounds
+        </p>
+    </div>
+
+    <div class="section">
+        <h2>Generate Documents</h2>
+        <p class="section-note">Creates multiple copies of the active document</p>
+
+        <div class="input-group">
+            <label>Images Folder:</label>
+            <div class="file-input">
+                <button id="selectImagesBtn" class="btn-secondary">Choose Folder</button>
+                <span id="imagesFolderName" class="file-name">No folder selected</span>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>Output Folder:</label>
+            <div class="file-input">
+                <button id="selectOutputBtn" class="btn-secondary">Choose Folder</button>
+                <span id="outputFolderName" class="file-name">No folder selected</span>
+            </div>
+        </div>
+
+        <button id="generateBtn" class="btn-primary">Generate All Documents</button>
+    </div>
+
+    <div class="section">
+        <h2>Export Active Document</h2>
+        <p class="section-note">Export to PDF and PNG files</p>
+
+        <div class="input-group">
+            <label>Export Folder:</label>
+            <div class="file-input">
+                <button id="selectExportBtn" class="btn-secondary">Choose Folder</button>
+                <span id="exportFolderName" class="file-name">No folder selected</span>
+            </div>
+        </div>
+
+        <button id="exportBtn" class="btn-primary">Export PDF & PNGs</button>
+    </div>
+
+    <div id="statusContainer"></div>
+
+    <div class="footer">
+        <strong>Tip:</strong> Save your template before generating documents
+    </div>
+
+    <script src="index.js"></script>
+</body>
+</html>
